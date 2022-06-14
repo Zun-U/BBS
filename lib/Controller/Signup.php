@@ -88,10 +88,23 @@ class Signup extends \Bbs\Controller
         $this->setErrors('email', $e->getMessage());
         return;
       }
+
+      $userModel = new \Bbs\Model\User();
+      $user = $userModel->login([
+        'email' => $_POST['email'],
+        'password' => $_POST['password']
+      ]);
+      session_regenerate_id(true);
+      $_SESSION['me'] = $user;
+      header('Location: '. SITE_URL . '/thread_all.php');
+      exit();
     }
+  }
+
+
 
     // ToDo:ユーザー登録後、ログイン処理を行う
-  }
+
 
   // バリデーションメソッド
   private function validate()
