@@ -8,6 +8,11 @@
     require_once(__DIR__ . '/header.php');
 
 
+    // __DIR__　⇒　なにか知りたければ、var_dump()を使う。
+    // 今回は「string(31) "C:\xampp\htdocs\bbs\public_html"」とpublic_htmlまでのパスが表示される。
+    // 「__DIR__」『現在自分がいるパスを取得する』というPHPで予め用意された関数。
+    // var_dump(__DIR__);
+
     // Signupクラスのインスタンス化
     // Controllerフォルダ内のSignup.phpの「Signup」クラスに書かれている処理を使えるようにしている。
     $app = new Bbs\Controller\Signup();

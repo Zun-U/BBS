@@ -32,6 +32,8 @@ class User extends \Bbs\Model
       throw new \Bbs\Exception\DuplicateEmail();
     }
   }
+
+
 public function login($values) {
   $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email;");
   $stmt->execute([
