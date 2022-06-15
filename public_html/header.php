@@ -1,5 +1,9 @@
 <?php
 require_once(__DIR__ .'/../config/config.php');
+
+// var_dumpで目印をつけながらコードを読み込んでいくのが、読みやすい。
+// var_dump("読み込まれた！");
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -24,15 +28,8 @@ require_once(__DIR__ .'/../config/config.php');
   <nav>
     <ul>
       <li><a href="<?= SITE_URL; ?>/">ホーム</a></li>
-      <?php
-      if(isset($_SESSION['me'])) { ?>
-      <li><a href="<?= SITE_URL; ?>/thread_all.php">一覧</a></li>
-      <li><a href="<?= SITE_URL; ?>/thread_favorite.php">お気に入り</a></li>
-      <li><a href="<?= SITE_URL; ?>/thread_create.php">作成</a></li>
-      <?php } else { ?>
         <li class="user-btn"><a href="<?= SITE_URL; ?>/login.php">ログイン</a></li>
         <li><a href="<?= SITE_URL; ?>/signup.php">ユーザー登録</a></li>
-      <?php } ?>
     </ul>
   </nav>
   <div class="header-r">

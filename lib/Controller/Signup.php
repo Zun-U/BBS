@@ -12,11 +12,12 @@ class Signup extends \Bbs\Controller
   // ２回目はフォーム送信をした時に。（登録ボタンを押して”自分自身”にフォーム送信され、再読み込みが行われた時）
   public function run()
   {
-    if ($this->isLoggedIn()) {
-      header('Location: ' . SITE_URL);
-      exit();
-    }
+    // if ($this->isLoggedIn()) {
+    //   header('Location: ' . SITE_URL);
+    //   exit();
+    // }
 
+    //☆☆　「$this」 PHPの疑似変数thisとは、クラスのインスタンス自身のことを指すもの。　☆☆
 
     // POSTメソッドがリクエストされていればpostProcessメソッド実行。
     // ”フォーム送信によって”この「run」が実行された時に、という意味。
@@ -89,6 +90,8 @@ class Signup extends \Bbs\Controller
         return;
       }
 
+
+      // ユーザー登録後に、ログイン後と同じページを表示する処理。
       $userModel = new \Bbs\Model\User();
       $user = $userModel->login([
         'email' => $_POST['email'],
