@@ -1,18 +1,42 @@
 <?php
 
+// すべてのファイルでよく使うファイルがここでまとめられている。（基本設定などの情報）
+// 今回は、ヘッダーが読み込まれているページであれば、config.phpのファイルが読み込まれている。
+
+
+
+
 //ini_set PHPの予め用意された関数。PHPのいろいろな設定を行うことが出来る。
 // display_errors
 // 1(true)又は0(false)で、PHPエラーの画面表示・非表示を設定できる。
 // エラーが出ると、開発のヒントになるのでエラー画面を”わざ”と出すようにしている。
 // ※ローンチするときには外す。
-ini_set('display_errors',1);
+ini_set('display_errors', 1);
 
 // PHPの構文
 // define('定数名', '値');
-define('DSN','mysql:host=localhost;charset=utf8;dbname=bbs');
-define('DB_USERNAME','bbs_user');
-define('DB_PASSWORD','QbSJHLeRgMPgnUe7');
+define('DSN', 'mysql:host=localhost;charset=utf8;dbname=bbs');
+define('DB_USERNAME', 'bbs_user');
+define('DB_PASSWORD', 'QbSJHLeRgMPgnUe7');
 define('SITE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/bbs/public_html');
-require_once(__DIR__ .'/../lib/Controller/functions.php');
+require_once(__DIR__ . '/../lib/Controller/functions.php');
 require_once(__DIR__ . '/autoload.php');
+
+
+
+
+// セッション変数とは、サーバー上に「ユーザー専用のデータの保管領域」を確保する仕組み。
+// サーバー上に「ユーザー専用のデータの保管領域」を確保する仕組みです。
+// hiddenは「各ユーザーの画面内（HTML）」にデータを保持していたのに対し、セッション変数は「サーバー内」にデータが保存される。
+// サーバーは多くのユーザーが同時に使っていますので、自分の保管領域にデータを出し入れするための「専用のキー」が発行される。
+// これを「セッションID」と言います。
+
+// どのページにも使う部分（今回はconfig）でセッションスタートしている。
+//　☆☆つまりどこても「セッション変数」が使えますよ、という環境をセットしている。
+
+// session_start()関数は、サーバー側では、指定されたディレクトリにセッション変数を保存するファイルが作成される。
+// 「session_start」がないと「セッション」機能が使えない。
+// ユーザー情報はログインしてからログアウトするまで、基本的に「セッション」に保存されている。
+// Coockieは「ブラウザ上（利用者のパソコン）」に保存される一時的な情報。SESSIONは「サーバー上」に保存されている一時的な情報。
+// このような情報は、悪意ある者のなりすましを防ぐために使われている。
 session_start();

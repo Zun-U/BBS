@@ -66,6 +66,14 @@ class Signup extends \Bbs\Controller
     } else {
 
 
+      // 「try~catch」構文---------------
+      // try {
+      //   //例外が起こりうる処理
+      // } catch (例外クラス名 $e) {
+      //   //例外が起きた時の処理
+      // -------------------------------
+
+
 
       // 「try」 予期せぬエラー
       // 例外が発生する可能性のある処理をここに記述する。
@@ -75,6 +83,8 @@ class Signup extends \Bbs\Controller
 
         // 「create」　登録処理
         // $_POST['email']　⇒　フォームの入力値を表している。ここではcreate()の（）内の引数として渡している。
+        // つまり、「$value」はフォームに入力された内容（配列）になる。
+        // create([])の形になっているため。[]は配列を意味する。
         $user = $userModel->create([
           'email' => $_POST['email'],
           'username' => $_POST['username'],
