@@ -83,7 +83,7 @@ class Signup extends \Bbs\Controller
 
         // 「create」　登録処理
         // $_POST['email']　⇒　フォームの入力値を表している。ここではcreate()の（）内の引数として渡している。
-        // つまり、「$value」はフォームに入力された内容（配列）になる。
+        // つまり、「$user」はフォームに入力された内容（配列）になる。
         // create([])の形になっているため。[]は配列を意味する。
         $user = $userModel->create([
           'email' => $_POST['email'],
@@ -141,7 +141,7 @@ class Signup extends \Bbs\Controller
 
 
       // 「throw」で”わざと”例外処理の発生
-      // 予期せぬエラーではなく、『あらかじめ例外を作っておいて』”予期した”例外エラーを発生させている。
+      // 予期せぬエラーではなく、『あらかじめ例外を作っておいて』わざと”予期した”例外エラーを発生させている。
       throw new \Bbs\Exception\InvalidEmail("メールアドレスが不正です!");
     }
 
