@@ -69,10 +69,17 @@ class Login extends \Bbs\Controller
       }
       // ログイン処理
       //session_regenerate_id関数･･･現在のセッションIDを新しいものと置き換える。セッションハイジャック対策
+      // セッションには基本的には個人情報が載っているので、IDを更新して外部から取得されにくくしている。
       session_regenerate_id(true);
+
       // ユーザー情報をセッションに格納
+      // 「$_SESSION['me']」という変数にユーザー情報を格納する理由は、使い回せるようになるため。ユーザー情報が欲しい時に色々な場所で使う。
       $_SESSION['me'] = $user;
+
+
       // スレッド一覧ページへリダイレクト
+      //  「header関数」　⇒　HTTPヘッダの内容を指定できる。主に指定したページにリダイレクトの用途。
+      // 　'Location: 'を最初に書くのがルール。
       header('Location: ' . SITE_URL . '/thread_all.php');
       exit();
     }
