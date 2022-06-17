@@ -13,6 +13,10 @@ $app->run();
     <label>最初のコメント</label>
     <textarea type="text" name="comment" class="form-control"><?= isset($app->getValues()->comment) ? h($app->getValues()->comment) : ''; ?></textarea>
     <input type="hidden" name="token" value="<?= h($_SESSION['token']); ?>">
+
+    <!--type="hidden"　隠されたフォーム送信。view側では見えなくなている。  -->
+    <!-- このフォーム部品は「name="type"」で「type」と名前を付けられている。 -->
+    <!--「value="createthread"」⇒  この「type」と名付けられた見えないフォーム部品から"送信される値は「createthread」"-->
     <input type="hidden" name="type" value="createthread">
     <p class="err"><?= h($app->getErrors('create_thread')); ?></p>
   </div>
