@@ -24,7 +24,7 @@ $threads = $threadMod->getThreadAll();
   <?php foreach ($threads as $thread) : ?>
 
 
-    <li class="thread__item">
+    <li class="thread__item" data-threadid="<?= $thread->t_id; ?>">
       <div class="thread__head">
         <h2 class="thread__ttl">
 
@@ -50,11 +50,11 @@ $threads = $threadMod->getThreadAll();
 
 
         </h2>
-        <div><i class="fas fa-star"></i></div>
+        <div class="fav__btn<?php if(isset($thread->f_id)) { echo ' active';} ?>"><i class="fas fa-star"></i></div>
       </div>
       <ul class="thread__body">
         <?php
-        $comments = $threadMod->getComment($thread->id);
+        $comments = $threadMod->getComment($thread->t_id);
         foreach ($comments as $comment) :
         ?>
           <li class="comment__item">
@@ -76,7 +76,7 @@ $threads = $threadMod->getThreadAll();
       <!-- クエリパラメーター -->
       <!-- ?thread_id=.....の部分 -->
       <!-- スレッドIDはどのスレッドか特定できる値になる。 -->
-        <a href="<?= SITE_URL; ?>/thread_disp.php?thread_id=<?= $thread->id; ?>">書き込む&すべて読む(<?= h($threadMod->getCommentCount($thread->id)); ?>)</a>
+        <a href="<?= SITE_URL; ?>/thread_disp.php?thread_id=<?= $thread->t_id; ?>">書き込む&すべて読む(<?= h($threadMod->getCommentCount($thread->t_id)); ?>)</a>
         <p class="thread__date">スレッド作成日時:<?= h($thread->created); ?></p>
       </div>
     </li>
