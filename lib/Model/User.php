@@ -94,4 +94,32 @@ class User extends \Bbs\Model
     }
     return $user;
   }
+
+
+  public function find($id)
+  {
+    $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id;");
+    $stmt->bindValue('id', $id);
+    $stmt->execute();
+    $stmt->setFetchMode(\PDO::FETCH_CLASS, 'stdClass');
+    $user = $stmt->fetch();
+    return $user;
+  }
+
+
+  // データベースでは画像はそのものではなく、ファイル『名』で保存する。※画像そのものは別で保存する。
+  // このユーザーさんはこの画像『名』の画像ファイルを使っているということがわかれば、表示させることができる。
+  public function update($values)
+  {
+    $stmt = $this->db->prepare("UPDATE users SET username = :username, email = :email, image = :image, modified = now() where id = :id");
+    $stmt->execute([
+      ':username' => $values['username'],
+      ':email' => $values['email'],
+      ':image' => $values['userimg'],
+      ':id' => $_SESSION['me']->id,
+    ]);
+    if ($res === false) {
+      throw new \Bbs\Exception\DuplicateEmail();
+    }
+  }
 }

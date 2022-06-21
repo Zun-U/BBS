@@ -73,6 +73,9 @@ class Thread extends \Bbs\Model
   // 全スレッド取得
   public function getThreadAll()
   {
+
+$user_id = $_SESSION['me']->id;
+
     // 「query」　バインド変数を使わない場合は、queryでSQL文を実行。
     $stmt = $this->db->query("SELECT id, title, created FROM threads where delflag = 0 order by id desc");
 
@@ -186,6 +189,38 @@ class Thread extends \Bbs\Model
       $this->db->commit();
     } catch (\Exception $e) {
       echo $e->getMessage();
+      $this->db->rollBack();
+    }
+  }
+
+
+  public function changeFavorite($values){
+    try{
+$this->db->beginTransacton();
+// レコード取得
+      $stmt = $this->db->prepare("SELECT * FROM favorites WHERE thread_id = :thread_id AND user_id = :user_id");
+      $stmt->execute([
+        ':thread_id' => $values['thread_id'],
+        ':user_id' => $values['user_id']
+      ]);
+      $stmt->setFeychMode(\PDO::FETCH_CLASS, 'stdClass');
+      $rec = $stmt->fetch();
+
+      $fav_flag = 0;
+      if(empty($rec)){
+        $sql = "INSERT INTO favorites ()thread_id,user_id,created) VALUES (:thread_id,:user_id,now())";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+          ':thread_id'=>$values['thread_id'],
+          ':user_id'=>$values['user_id']
+        ]);
+        $fav_flag = 0;
+      }
+      $this->db->commit();
+      retrun $fav_flag;
+    } catch(\Exeption $e){
+      echo $e->getMessage();
+      // エラーがあったら元に戻す
       $this->db->rollBack();
     }
   }
