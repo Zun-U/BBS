@@ -12,6 +12,18 @@ $threads = $threadMod->getThreadAll();
 
 ?>
 <h1 class="page__ttl">スレッド一覧</h1>
+
+<form action="thread_search.php" method="get" class="form-group form-search">
+  <div class="form-group">
+    <input type="text" name="keyword" placeholder="スレッド検索">
+  </div>
+  <div class="form-group">
+  <input type="submit" value="検索" class="btn btn-primary">
+  <input type="hidden" name="type" value="searchthread">
+  </div>
+</form>
+
+
 <ul class="thread">
 
   <!-- foreach文 -->
@@ -50,18 +62,20 @@ $threads = $threadMod->getThreadAll();
 
 
         </h2>
-        <div class="fav__btn<?php if(isset($thread->f_id)) { echo ' active';} ?>"><i class="fas fa-star"></i></div>
+        <div class="fav__btn<?php if (isset($thread->f_id)) {
+                              echo ' active';
+                            } ?>"><i class="fas fa-star"></i></div>
       </div>
       <ul class="thread__body">
         <?php
         $comments = $threadMod->getComment($thread->t_id);
-        foreach ($comments as $comment) :
+        foreach($comments as $comment):
         ?>
           <li class="comment__item">
             <div class="comment__item__head">
-              <span class="commit__item__num"><?= h($comment->commnt_num); ?></span>
+              <span class="comment__item__num"><?= h($comment->comment_num); ?></span>
               <span class="comment__item__name">名前:<?= h($comment->username); ?></span>
-              <span class="comment__item__date">投稿日時:<?= h($commit->created)($comment->created); ?></span>
+              <span class="comment__item__date">投稿日時:<?= h($comment->created); ?></span>
             </div>
             <p class="comment__item__content"><?= h($comment->content); ?></p>
           <?php endforeach; ?>
@@ -70,13 +84,13 @@ $threads = $threadMod->getThreadAll();
       </ul>
       <div class="operation">
 
-      <!--/Model/Thread.phpの「getCommentCount」という関数に、($thread->id)とスレッドのIDを渡してあげている。（スレッドIDが分かれば、どのスレッドか特定できるため。） -->
+        <!--/Model/Thread.phpの「getCommentCount」という関数に、($thread->id)とスレッドのIDを渡してあげている。（スレッドIDが分かれば、どのスレッドか特定できるため。） -->
 
 
-      <!-- クエリパラメーター -->
-      <!-- ?thread_id=.....の部分 -->
-      <!-- スレッドIDはどのスレッドか特定できる値になる。 -->
-        <a href="<?= SITE_URL; ?>/thread_disp.php?thread_id=<?= $thread->t_id; ?>">書き込む&すべて読む(<?= h($threadMod->getCommentCount($thread->t_id)); ?>)</a>
+        <!-- クエリパラメーター -->
+        <!-- ?thread_id=.....の部分 -->
+        <!-- スレッドIDはどのスレッドか特定できる値になる。 -->
+        <a href="<?= SITE_URL; ?>/thread_disp.php?thread_id=<?= $thread->t_id; ?>">書き込み&すべて読む(<?= h($threadMod->getCommentCount($thread->t_id)); ?>)</a>
         <p class="thread__date">スレッド作成日時:<?= h($thread->created); ?></p>
       </div>
     </li>

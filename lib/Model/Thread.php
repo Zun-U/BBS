@@ -74,10 +74,17 @@ class Thread extends \Bbs\Model
   public function getThreadAll()
   {
 
-$user_id = $_SESSION['me']->id;
+    $user_id = $_SESSION['me']->id;
 
     // 「query」　バインド変数を使わない場合は、queryでSQL文を実行。
-    $stmt = $this->db->query("SELECT id, title, created FROM threads where delflag = 0 order by id desc");
+
+    // 「LEFT JOIN」でテーブルを結合するが、同名の列がある場合は結合できないため、カスタムデータ属性で名前を異なるようにしている。
+    // (t_id、f_idなど)
+    $stmt = $this->db->query("SELECT t.id AS t_id, title, t.created, f.id AS f_id FROM threads AS t LEFT JOIN favorites AS f ON t.delflag = 0 AND t.id = f.thread_id AND f.user_id = $user_id ORDER BY t.id desc");
+
+
+    // 「LEFT　JOIN」である理由　⇒　スレッドの全件を表示したい、『お気に入りであるがなかろうが』。
+    // 結合の条件が一致しなくてもとりあえず「threads」の情報が全件表示される。
 
 
 
@@ -114,6 +121,11 @@ $user_id = $_SESSION['me']->id;
     return $stmt->fetchAll(\PDO::FETCH_OBJ);
   }
 
+  // CSV出力
+  public function getCommentCsv($thread_id){$stmt = $this->db->prepare("SELECT comment_num, username, content, comments.created FROM (threads INNER JOIN comments ON threads.id = comments.thread_id) INNER JOIN users ON comments.user_id = users.id WHERE threads.id = :thread_id AND comments.delflag = 0 ORDER BY comment_num ASC;");
+    $stmt->execute([':thread_id' => $thread_id]);
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
 
   // コメント数取得
   public function getCommentCount($thread_id)
@@ -194,34 +206,85 @@ $user_id = $_SESSION['me']->id;
   }
 
 
-  public function changeFavorite($values){
-    try{
-$this->db->beginTransacton();
-// レコード取得
+  public function changeFavorite($values)
+  {
+    try {
+      $this->db->beginTransaction();
+      // レコード取得
+      // お気に入り（favorites）テーブルにデータが登録されているかどうかを調べる。
       $stmt = $this->db->prepare("SELECT * FROM favorites WHERE thread_id = :thread_id AND user_id = :user_id");
       $stmt->execute([
         ':thread_id' => $values['thread_id'],
         ':user_id' => $values['user_id']
       ]);
-      $stmt->setFeychMode(\PDO::FETCH_CLASS, 'stdClass');
+      $stmt->setFetchMode(\PDO::FETCH_CLASS, 'stdClass');
+
+      // $rec  ⇒　上記SELECT文の結果が１行で保存される。
       $rec = $stmt->fetch();
 
+
       $fav_flag = 0;
-      if(empty($rec)){
-        $sql = "INSERT INTO favorites ()thread_id,user_id,created) VALUES (:thread_id,:user_id,now())";
+
+      //  $rec  ⇒　上記SELECT文の結果
+      // empty($rec)　⇒　その結果が空であれば。（ここではお気に入りテーブルに登録されていなければ）
+      if (empty($rec)) {
+
+        // データに何も登録されていないので、新規のお気に入り登録。
+        $sql = "INSERT INTO favorites (thread_id,user_id,created) VALUES (:thread_id,:user_id,now())";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-          ':thread_id'=>$values['thread_id'],
-          ':user_id'=>$values['user_id']
+          ':thread_id' => $values['thread_id'],
+          ':user_id' => $values['user_id']
+        ]);
+        $fav_flag = 1;
+      }
+
+      // すでにお気に入り登録されていれば、テーブルから削除。
+      else {
+        $sql = "DELETE FROM favorites WHERE thread_id = :thread_id AND user_id = :user_id";
+        $stmt = $this->db->prepare($sql);
+        $res = $stmt->execute([
+          ':thread_id' => $values['thread_id'],
+          ':user_id' => $values['user_id']
         ]);
         $fav_flag = 0;
       }
       $this->db->commit();
-      retrun $fav_flag;
-    } catch(\Exeption $e){
+
+      // 呼び出し元に「$fav_flag;」を返している。　⇒　呼び出し元はAjax.php
+      return $fav_flag;
+    } catch (\Exception $e) {
       echo $e->getMessage();
       // エラーがあったら元に戻す
       $this->db->rollBack();
     }
+  }
+
+
+
+
+  // お気に入りの中の全スレッド取得
+  public function getThreadFavoriteAll()
+  {
+    $user_id = $_SESSION['me']->id;
+    $stmt = $this->db->query("SELECT t.id AS t_id, title, t.created, f.id AS f_id FROM threads AS t INNER JOIN favorites AS f ON t.delflag = 0 AND t.id = f.thread_id AND f.user_id = $user_id ORDER BY t.id desc");
+
+    //  「threads AS t」　⇒　「threads」テーブルを「t」という別名を付けている。
+    //  「 AS f」 favorites⇒　「favorites」テーブルを「f」という別名を付けている。
+    //  「t.id AS t_id」　⇒　「threads」テーブルの「id」列を「t_id」と別名を付けている。
+
+    //  どのテーブルの列なのかを判別するために、テーブルに別名を付けている。　
+
+    // 「t.id = f.thread_id」　⇒　「threads」テーブルの「id」　と　「favorites」テーブルの「thread_id」が一致するもの。
+
+    // 「f.user_id = $user_id」　⇒　「favorites」テーブルの「user_id」と「$user_id」（★ログインしているユーザーのID★）が一致するもの。
+    // ログインしているユーザーが必要。
+
+
+
+    // 「INNER JOIN」 である理由　⇒　結合の条件が一致するもののみ表示される。※お気に入り登録一覧のみを表示したいため。
+
+
+    return $stmt->fetchAll(\PDO::FETCH_OBJ);
   }
 }
