@@ -55,24 +55,75 @@ $(function () {
   }
   );
 
-  $('.fav__btn').on('click',function(){
-    const origin = location.origin;
-    const $favbtn = $(this);
-    const $threadid = $favbtn.parent().parent().data('threadid');
-    const $myid = $('.prof-show').data('me');
+
+  // 処理に必要なDOMの取得
+  $('.fav__btn').on('click', function () {
+
+    // 「location.origin」　⇒　jQueryのメソッド。プロトコルやポートを含めたURLを取得する。
+    // ここでは「http://localhost」まで取得している。
+    var origin = location.origin;
+
+
+    // 「$(this)」　⇒　イベントの引き金になっているもの。★データ取得専用の変数★　ここでは('.fav__btn')の部分。
+    var $favbtn = $(this);
+
+    // 『data()』　⇒　とあるデータについているカスタムデータ属性の値を取得する。()の中が「どのデータか」を表している。「data-」の先の部分だけ指定（ここではthreadid）すれば良い。（data-threadid）は値として挿入できない。
+    var $threadid = $favbtn.parent().parent().data('threadid');
+
+    // 「data」　⇒　「data-me」のカスタム属性に紐づいた値を取得。
+    var $myid = $('.prof-show').data('me');
+
+
+
+
+
+
+    // --------------------------------------------------------------
+    // ajax処理
+    //画像の遷移のない通信を「非同期通信」と言います。
+    // 同期処理は一瞬画面が白くなって、画面を切り替わることを言います。
+    // --------------------------------------------------------------
+
+
+
+
+    // 「$.ajax」以降がajax処理。
     $.ajax({
+
+      // 送信方法の指定。今回は「post」。※データを隠しながら送信する方法。
       type: 'post',
-      ulr: origin + '/public_html/ajax.php',
+
+      // 送信先の指定。どのファイルに対してajaxのデータを送信するか。
+      // 今回は「http://localhost/bbs/public_html/ajax.php」に送信。変数「origin」には「http://localhost」までのURLが入っている。
+      // ☆☆　また、「bbs/public_html/ajax.php」にあるJSON形式のファイルは、『ajax処理で操作できる』。
+      url: origin + '/bbs/public_html/ajax.php',
+
+      // 実際に渡すデータ
       data: {
+        // シングルクォーテーション(')で囲まれているもの＝key
+        // どのユーザーがどの情報を
         'thread_id': $threadid,
         'user_id': $myid,
       },
-      success: function(data){
-        if(data == 1){
-          $(favbtn).addClass('active');
+
+
+      // 「success」　⇒　ajax通信がうまく言ったら、「success」の中身を実行してください、という処理。
+      // JSONのデータがajax処理の(data)に保存される。
+      success: function (data) {
+
+
+
+        // バックエンドで作った値をフロントエンドで扱う場合は、必ずJSON形式に直してから処理を実行する。
+        // その為、複雑な書き方になっている。
+        // （※AJAX送信の非同期処理を行いたいからこうなっている。（UXの観点から））
+
+        // ajax．phpで「$res」の中身がjson形式に変換され、ここで使用されている。
+        if (data == 1) {
+          // 「$fav_flag = 1」なら（INSERT文でお気に入りテーブルに情報が登録されたら）、active属性を付与する。（CSSで装飾する（★を黄色にする））
+          $($favbtn).addClass('active');
         }
-        else{
-          $(favbtn).removeClass('active');
+        else {
+          $($favbtn).removeClass('active');
         }
       }
     });

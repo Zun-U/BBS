@@ -26,6 +26,12 @@ $threadDisp = $threadMod->getThread($thread_id);
       <h2 class="thread__ttl">
         <?= h($threadDisp->title); ?>
       </h2>
+      <form id="csvoutput" method="post" action="thread_csv.php">
+        <button class="btn btn-primary" onclick="document.getElementById('csvoutput').submit();">CSV出力</button>
+        <input type="hidden" name="thread_id" value="<?= h($thread_id); ?>">
+        <input type="hidden" name="token" value="<?= h($_SESSION['token']); ?>">
+        <input type="hidden" name="type" value="outputcsv">
+      </form>
     </div>
     <ul class="thread__body">
       <?php

@@ -46,7 +46,11 @@ require_once(__DIR__ . '/../config/config.php');
         <?php
         // ↓↓セッション変数があれば、というif文。つまりログインしてるか、していないかをSESSION変数の有無で判断している。
         if (isset($_SESSION['me'])) { ?>
-          <div class="prof-show" data-me="<?= h($_SESSEION['me']->id); ?>">
+
+
+          <!-- カスタムデータ属性 -->
+          <!--  ここでは「data-me」というデータ属性にユーザーIDの値が定義されている。 -->
+          <div class="prof-show" data-me="<?= h($_SESSION['me']->id); ?>">
 
 
 
