@@ -122,4 +122,13 @@ class User extends \Bbs\Model
       throw new \Bbs\Exception\DuplicateEmail();
     }
   }
+
+
+  public function delete() {
+    $stmt = $this->db->prepare("UPDATE users SET delflag = :delflag, modified = now() WHERE id = :id");
+    $stmt->execute([
+      ':delflag' => 1,
+      ':id' => $_SESSION['me']->id,
+    ]);
+  }
 }

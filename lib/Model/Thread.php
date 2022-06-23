@@ -287,4 +287,15 @@ class Thread extends \Bbs\Model
 
     return $stmt->fetchAll(\PDO::FETCH_OBJ);
   }
+
+
+
+  public function searchThread($keyword){
+    // 「LIKE演算子」　⇒　パターンマッチング。キーワードでデータ検索。
+    $stmt = $this->db->prepare("SELECT * FROM threads WHERE title LIKE :title AND delflag = 0;");
+    // キーワードの指定部分。（「あいまい検索」の指定）
+    // 『%』　⇒　任意の0文字以上の文字列。
+    $stmt->execute([':title' => '%'.$keyword. '%']);
+    return $stmt->fetchAll(\PDO::FETCH_OBJ);
+  }
 }
