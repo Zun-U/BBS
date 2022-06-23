@@ -6,7 +6,7 @@ class Thread extends \Bbs\Controller
 {
   public function run()
   {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
       // $_POST['type']　⇒　「type」というname属性を持っているフォーム部品からPOST送信された値が、
@@ -15,10 +15,18 @@ class Thread extends \Bbs\Controller
       // つまり、「スレッド作成」ボタンを押したら、createThread（スレッド作成処理の関数名）を実行しなさい、の意。
       if ($_POST['type']  === 'createthread') {
         $this->createThread();
-      } else if ($_POST['type'] === 'createcomment') {
+      } elseif($_POST['type'] === 'createcomment') {
         $this->createComment();
       }
+      // 「run」の実行タイミングは２回ある。１回目はアクセスしたタイミング、２回目はフォーム送信したタイミング。
+      // 『notice undefined index』エラーはPOST・GET送信の中身が何かわからない状態で発生する。
+      // 「isset関数」でGET送信の中身の有無を確認している。
+    } elseif(isset($_GET['type'])){
+    if($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['type'] === 'searchthread') {
+      $threadData = $this->searchThread();
+      return $threadData;
     }
+  }
   }
 
   private function createThread()
@@ -82,31 +90,95 @@ class Thread extends \Bbs\Controller
   }
 
 
-  public function outputCsv($thread_id){
-    try{
+  public function outputCsv($thread_id)
+  {
+    try {
       $threadModel = new \Bbs\Model\Thread();
       $data = $threadModel->getCommentCsv($thread_id);
-      $csv = array('num','username','content','date');
-      $csv = mb_convert_encoding($csv,'SJIS-WIN','UTF-8');
+
+
+      // CSVの出力部分（ファイルに対しての設定部分）
+      $csv = array('num', 'username', 'content', 'date');
+
+
+      // 「mb_convert_encoding」　文字コードの変換（エンコード）
+      // エクセルは「ShiftJIS」という文字コードで設定されている。
+      // 「UTF-8」　⇒　「SJIS-WIN」
+      $csv = mb_convert_encoding($csv, 'SJIS-WIN', 'UTF-8');
+
+      // 「date関数」 ⇒　現在日時の保存。出力するファイル名に使用する。
       $date = date("YmdH:i:s");
+
+      // 『header関数』どういった名前でどういった形式のファイルを出力するのか
       header('Content-Type: application/octet-stream');
-      header('Content-Disposition: attachment; filename=' . $date .'_thread.csv');
+      // 「filename=」　⇒　実際のファイル名の部分。
+      header('Content-Disposition: attachment; filename=' . $date . '_thread.csv');
+
+
+
+
+
+      // 今から出力させるファイルにプログラムで内容（データ）を書き込む部分
+
+      // 『ファイルポインター』　⇒　データを記載している位置を表すもの。
+
+      // 「fopen関数」　⇒　ファイルまたはURLをオープンしてくれる関数。
       $stream = fopen('php://output', 'w');
       stream_filter_prepend($stream, 'convert.iconv.utf-8/cp932');
       $i = 0;
-      foreach($data as $row){
-        if($i === 0){
+
+      // 繰り返し処理　$data⇒Modelから取得してきたスレッドの情報
+      // 1行づつループ処理。
+      foreach ($data as $row) {
+        //1回目のループ(1行目)
+        if ($i === 0) {
+          // 「fputcsv関数」⇒CSVの形式でデータを書き込むメソッド。
+          //  $csv = array('num', 'username', 'content', 'date')　⇒　配列が保存されている。
           fputcsv($stream, $csv);
         }
+        // データベースから取得してきたデータ（1行分）を書き込む。
         fputcsv($stream, $row);
         $i++;
       }
-    }
-    catch(Exception $e){
+    } catch (Exception $e) {
       echo $e->getMessage();
     }
   }
 
+
+  public function searchThread()
+  {
+    try {
+      $this->validateSearch();
+    } catch (\Bbs\Exception\EmptyPost $e) {
+      $this->setErrors('keyword', $e->getMessage());
+    } catch (\Bbs\Exception\CharLength $e) {
+      $this->setErrors('keyword', $e->getMessage());
+    }
+
+    $keyword = $_GET['keyword'];
+    $this->setValues('keyword', $keyword);
+    if ($this->hasError()) {
+      return;
+    } else {
+      $threadModel = new \Bbs\Model\Thread();
+      $threadData = $threadModel->searchThread($keyword);
+      return $threadData;
+    }
+  }
+
+
+  private function validateSearch()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['type'])) {
+      if ($_GET['keyword'] === '') {
+        throw new \Bbs\Exception\EmptyPost("検索キーワードが入力されていません！");
+      }
+      if (mb_strlen($_GET['keyword']) > 20) {
+        throw new \Bbs\Exception\CharLength("キーワードが長すぎます！");
+      }
+    }
+  }
 
 
   // バリデーション～入力値チェック～

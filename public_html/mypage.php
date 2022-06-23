@@ -63,6 +63,10 @@ $app->run();
       </div>
     </div>
   </form>
+  <form class="user-delete" action="user_delete_confirm.php" method="post">
+    <input type="submit" class="btn btn-default" value="退会する">
+    <input type="hidden" name="token" value="<?= h($_SESSION['token']); ?>">
+  </form>
 </div><!-- container -->
 <?php
 require_once(__DIR__ . '/footer.php');

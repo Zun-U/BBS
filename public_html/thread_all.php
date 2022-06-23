@@ -13,12 +13,16 @@ $threads = $threadMod->getThreadAll();
 ?>
 <h1 class="page__ttl">スレッド一覧</h1>
 
+<!-- 『get送信』　⇒　入力した内容をHTMLに乗っけて指定したページに送信できる。（※機密性があるものは情報漏洩の可能性がるため使えない。） -->
+<!-- 送信先は「thread_search.php」-->
 <form action="thread_search.php" method="get" class="form-group form-search">
   <div class="form-group">
+    <!-- GET送信内容1⃣：フォームの入力内容 -->
     <input type="text" name="keyword" placeholder="スレッド検索">
   </div>
   <div class="form-group">
   <input type="submit" value="検索" class="btn btn-primary">
+  <!--　GET送信内容2⃣：「searchthread」という文言  -->
   <input type="hidden" name="type" value="searchthread">
   </div>
 </form>
