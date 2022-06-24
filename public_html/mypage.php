@@ -54,11 +54,22 @@ $app->run();
           </label>
           <div class="imgfile">
 
-          <!-- 画像を表示する部分 -->
-          <!-- './gazou/'　⇒　画像フォルダの -->
-          <!-- h($app->getValues()->image)　⇒　ユーザーが設定した画像 -->
+            <!-- 画像を表示する部分 -->
+            <!-- './gazou/'　⇒　画像フォルダの -->
+            <!-- h($app->getValues()->image)　⇒　ユーザーが設定した画像 -->
             <img src="<?= isset($app->getValues()->image) ? './gazou/' . h($app->getValues()->image) : './asset/img/noimage.png'; ?>" alt="">
           </div>
+
+
+          <!--　登録画像削除ボタン  -->
+          <label>
+            <span class="file-delbtn">
+              ユーザー画像削除
+              <input type="submit" id="delimg" class="form" style="display:none">
+            </span>
+          </label>
+
+
         </div>
       </div>
     </div>

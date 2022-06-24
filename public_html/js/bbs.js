@@ -56,6 +56,16 @@ $(function () {
   );
 
 
+
+  // 登録画像の削除
+  $('#delimg').click(function ()
+  
+  )
+
+
+
+
+
   // 処理に必要なDOMの取得
   $('.fav__btn').on('click', function () {
 
@@ -129,4 +139,10 @@ $(function () {
     });
     return false;
   });
+
+
+
+
+
+
 });
