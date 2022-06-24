@@ -30,7 +30,7 @@ class User extends \Bbs\Model
     // メールアドレスがユニークでなければfalseを返す
     // （メールアドレスがすでに登録されている場合）
     if ($res === false) {
-      var_dump($values);
+      // var_dump($values);
       throw new \Bbs\Exception\DuplicateEmail();
     }
   }
@@ -69,6 +69,11 @@ class User extends \Bbs\Model
       // ':email'がkeyで$values['email']が値。
       // つまり今回では、「:email」keyにはユーザーが入力した「email」の値が紐づくという意味になる。
       // ここでは「$values」はSignup.phpで「関数create」で実行されたユーザーのフォーム入力情報となる。
+
+
+
+
+
     ]);
 
 
@@ -92,10 +97,19 @@ class User extends \Bbs\Model
     if (!password_verify($values['password'], $user->password)) {
       throw new \Bbs\Exception\UnmatchEmailOrPassword();
     }
+
+    // 退会済みのユーザーであればログインできなくする。
+    // $userには『オブジェクト形式』で連想配列の値が格納されているため、値を取り出すにはアロー演算子でなければいけない。
+    if ($user->delflag === '1') {
+      throw new \Bbs\Exception\DeleteUser();
+    }
+
+    // var_dump($user->delflag);
+    // exit;
     return $user;
   }
 
-
+  // 引数として渡されたidに紐づいたユーザー情報をSELECT文で取得し、配列（1行）の形で $userにしまっている。
   public function find($id)
   {
     $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id;");
@@ -123,10 +137,13 @@ class User extends \Bbs\Model
     }
   }
 
-
-  public function delete() {
+  // 現在ログインしているユーザーに紐づくIDを検索条件に、「Users」の「delflag」の値を「１」にUPDATE文で書き換え、論理削除を行っている。
+  public function delete()
+  {
     $stmt = $this->db->prepare("UPDATE users SET delflag = :delflag, modified = now() WHERE id = :id");
     $stmt->execute([
+
+      // 「=>（ダブルアロー演算子）」　⇒　”連想配列”のこの「キー」にこの「値」を入れる、というもの。配列に値を代入するための演算子。
       ':delflag' => 1,
       ':id' => $_SESSION['me']->id,
     ]);

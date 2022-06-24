@@ -6,7 +6,10 @@ class UserDelete extends \Bbs\Controller
 {
   public function run()
   {
+    // 『User』クラスのインスタンス化
     $user = new \Bbs\Model\User();
+
+    // 現在のセッションに紐づいて保存されているユーザーのIDからSELECT文でそのユーザー情報を調べている。
     $userData = $user->find($_SESSION['me']->id);
     $this->setValues('username', $userData->username);
     $this->setValues('email', $userData->email);
@@ -20,6 +23,7 @@ class UserDelete extends \Bbs\Controller
       $userModel = new \Bbs\Model\User();
       $userModel->delete();
 
+      // ログアウトと同様、ユーザー退会のときも「SESSION」の破棄が行われる。
       $_SESSION = [];
 
       // クッキーにセッションで使用されているクッキーの名前がセットされていたら空にする

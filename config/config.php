@@ -40,3 +40,54 @@ require_once(__DIR__ . '/autoload.php');
 // Coockieは「ブラウザ上（利用者のパソコン）」に保存される一時的な情報。SESSIONは「サーバー上」に保存されている一時的な情報。
 // このような情報は、悪意ある者のなりすましを防ぐために使われている。
 session_start();
+
+
+
+
+
+// 非ログイン時のリダイレクト処理
+
+// 『$_SERVER』　⇒　サーバー情報、および実行時の環境情報を取得するPHPのメソッド
+//  インデックス『REQUEST_URI』　⇒　ページにアクセスするために指定された URI。例えば、 '/index.html'。
+$current_uri = $_SERVER["REQUEST_URI"];
+
+
+// 『basename』　⇒　()内で指定されたページのファイル名を取得する。ここでは現在表示されているページから、という意。
+$file_name = basename($current_uri);
+
+
+// var_dump($_SERVER["REQUEST_URI"]);
+// echo '<br>';
+// var_dump($file_name );
+// exit;
+
+
+//『strpos』　⇒　指定した文字列の中に、指定した文字が含まれているかどうかチェックするPHPの処理。
+if(strpos($file_name, 'login.php') !== false || strpos($file_name,'signup.php') !== false || strpos($file_name,'index.php') !== false || strpos($file_name,'public_html') !== false){
+  // URL内のファイル名がlogin.php、signup.php、index.php(public_html)のとき
+  // IF文の中に何も処理がない　⇒　何もしない　⇒　ファイル名がlogin.php、signup.php、index.php(public_html)なら「何もしない」
+}
+else{
+  // それ以外の時（上記以外のURL、またはよくわからないURLから飛んできた時）
+  // 「!isset($_SESSION['me']」　⇒　ログインの有無判定。値がセットされていなければ、つまりログインされていなければ。
+  if(!isset($_SESSION['me'])){
+
+    // ヘッダー関数で指定した画面に変遷させる。⇒ここでは、login.phpに飛ばす。
+    header('Location: '. SITE_URL . '/login.php');
+    exit();
+  }
+}
+
+
+
+// 『URI』は「Uniform Resource Identifier」の略で、『Web上にあるあらゆるファイルを認識するための識別子の総称』で、☆☆URNとURLで構成されています。☆☆
+// 1つのファイルの「住所」を示すのがURL、「名前」を示すのがURNで、それらの総称がURIです。
+// URLとURNはURIの枠組みの中にあるため、URL＝URIで、URN＝URIと考えても問題ないでしょう。
+
+
+
+
+// ☆☆☆☆　
+//「http:(もしくはhttps:)」は『URI側のパーツ』で、URLには含まれません。
+// なので、「 https://ferret-plus.com/ 」は、正確には「URI」と呼ばれます。
+// ☆☆☆☆

@@ -61,7 +61,7 @@ class UserUpdate extends \Bbs\Controller
 
 
       // データベースに変更前の画像がない場合、「NULL」を代入する。
-      if($old_img == '') {
+      if ($old_img == '') {
         $old_img = NULL;
       }
 
@@ -125,6 +125,12 @@ class UserUpdate extends \Bbs\Controller
     $_SESSION['me']->username = $_POST['username'];
     header('Location: ' . SITE_URL . '/mypage.php');
     exit();
+  }
+
+
+  private function deleteimg()
+  {
+    unlink('./gazou/' . $old_img);
   }
 
   private function validate()

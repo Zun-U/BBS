@@ -290,6 +290,11 @@ textarea {
   font-weight: bold;
 }
 
+
+label .file-delbtn{
+  margin-top: 20px;
+}
+
 .copy {
   text-align: center;
 }
